@@ -6,8 +6,6 @@ import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Repositories.UserRepository;
 import com.assessment.vendormachine.Services.ICrudService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +22,14 @@ public class UserService implements IUserService, ICrudService<User, Long> {
 
     @Override
     public User add(User user) {
-        if (userRepository.findAll().isEmpty())
-            user.setRole(ROLE.BUYER);
-        user.setPassword(bcryptEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        if (userRepository.findByUsername(user.getUsername()) == null) {
+            if (userRepository.findAll().isEmpty())
+                user.setRole(ROLE.BUYER);
+            user.setPassword(bcryptEncoder.encode(user.getPassword()));
+            return userRepository.save(user);
+        }
+        return null;
+
     }
 
     @Override
@@ -64,10 +66,6 @@ public class UserService implements IUserService, ICrudService<User, Long> {
         return userRepository.findByUsername(username);
     }
 
-    @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
 }
 
 

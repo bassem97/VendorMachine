@@ -5,10 +5,9 @@ import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Services.User.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -19,19 +18,27 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("")
-    public ResponseEntity<List<User>> findAll() {
+    public ResponseEntity findAll() {
+        if (userService.findAll().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
         return ResponseEntity.ok(userService.findAll());
     }
 
     @PostMapping("/register")
-    public User add(@RequestBody User user) {
-        log.info("Registering user: {}", user);
-        return userService.add(user);
+    public ResponseEntity add(@RequestBody User user) {
+        if (userService.add(user) == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+        }
+        return ResponseEntity.ok().body(user);
     }
 
     @PutMapping("/{id}")
-    public User update(@RequestBody User user, @PathVariable("id") Long id) {
-        return userService.update(user, id);
+    public ResponseEntity update(@RequestBody User user, @PathVariable("id") Long id) {
+        if (userService.update(user, id) == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("could not find user");
+        }
+        return ResponseEntity.ok(userService.update(user, id));
     }
 
     @DeleteMapping("/{id}")
@@ -41,7 +48,10 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable("id") Long id) {
-        return userService.findById(id);
+    public ResponseEntity findById(@PathVariable("id") Long id) {
+        if (userService.findById(id) == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("could not find user");
+        }
+        return ResponseEntity.ok(userService.findById(id));
     }
 }
