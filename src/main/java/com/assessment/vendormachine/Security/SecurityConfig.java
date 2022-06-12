@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors();
+        http.logout().logoutUrl("/auth/logout").logoutSuccessUrl("/auth/login");
     }
 
     @Override
@@ -63,6 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .exposedHeaders("Authorization");
     }
+
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {

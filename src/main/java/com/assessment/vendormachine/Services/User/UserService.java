@@ -6,6 +6,7 @@ import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Repositories.UserRepository;
 import com.assessment.vendormachine.Services.ICrudService;
 import com.assessment.vendormachine.Services.Product.ProductService;
+import com.assessment.vendormachine.Utils.BuyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -83,24 +84,19 @@ public class UserService implements IUserService, ICrudService<User, Long> {
     }
 
     @Override
-    public User buy(Long productId, int quantity) {
+    public BuyResponse buy(Long productId, int quantity) {
         final User currentUser = getCurrentUser();
         Product product = productService.findById(productId);
         int totalAmount = quantity * product.getCost();
         if (currentUser.getDeposit() >= totalAmount && product.getAmountAvailable() >= quantity) {
             currentUser.setDeposit(currentUser.getDeposit() - totalAmount);
             currentUser.setTotalSpent(currentUser.getTotalSpent() + totalAmount);
-            // add product to user list boughtProducts if not already present else get product from list and increase quantity
-//            if (currentUser.getBoughtProducts().contains(product)) {
-//                Product product1 = currentUser.getBoughtProducts().get(currentUser.getBoughtProducts().indexOf(product));
-//                product1.setQuantity(product1.getQuantity() + quantity);
-//            } else {
-//                product.setQuantity(quantity);
-//                currentUser.getBoughtProducts().add(product);
-//            }
-
             productService.decreaseAmountAvailable(product, quantity);
-            return userRepository.save(currentUser);
+            if (!currentUser.getBoughtProducts().contains(product))
+                currentUser.getBoughtProducts().add(product);
+            userRepository.save(currentUser);
+            return new BuyResponse(currentUser.getTotalSpent(), currentUser.getBoughtProducts());
+
         }
         return null;
     }
@@ -111,6 +107,7 @@ public class UserService implements IUserService, ICrudService<User, Long> {
         final User currentUser = findByUsername(authentication.getName());
         return currentUser;
     }
+
 
 }
 

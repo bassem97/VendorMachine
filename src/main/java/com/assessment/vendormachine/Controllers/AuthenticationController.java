@@ -9,6 +9,7 @@ import com.assessment.vendormachine.Utils.LoginModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +36,10 @@ public class AuthenticationController {
 
     @PostMapping("login")
     public ResponseEntity<?> authenticate(@RequestBody LoginModel loginModel) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User with same username already logged in");
+
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginModel.getUsername(),
@@ -43,10 +48,17 @@ public class AuthenticationController {
         );
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginModel.getUsername());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         final String token;
         token = tokenProvider.generateToken(userDetails, 1);
         return ResponseEntity.ok(new JwtRespone(token));
     }
+
+//    @GetMapping("/logout")
+//    boolean logout(@AuthenticationPrincipal final User user) {
+////        authentication.logout(user);
+////        return true;
+//    }
 
 
 }

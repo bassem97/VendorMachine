@@ -3,6 +3,7 @@ package com.assessment.vendormachine.Controllers;
 
 import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Services.User.UserService;
+import com.assessment.vendormachine.Utils.BuyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -74,8 +75,12 @@ public class UserController {
     @PostMapping("/buy/{productId}/{quantity}")
     @PreAuthorize("hasRole('ROLE_BUYER')")
     public ResponseEntity buy(@PathVariable("productId") Long productId, @PathVariable("quantity") int quantity) {
-        if (userService.buy(productId, quantity) == null)
+        BuyResponse buyResponse = userService.buy(productId, quantity);
+        if (buyResponse == null)
             return ResponseEntity.status(HttpStatus.CONFLICT).body("you either don't have enough money or product quantity is not enough");
-        return ResponseEntity.ok(userService.buy(productId, quantity));
+        return ResponseEntity.ok(buyResponse);
+
     }
+
+
 }

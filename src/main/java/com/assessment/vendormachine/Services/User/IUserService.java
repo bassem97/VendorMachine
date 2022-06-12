@@ -1,6 +1,7 @@
 package com.assessment.vendormachine.Services.User;
 
 import com.assessment.vendormachine.Entities.User;
+import com.assessment.vendormachine.Utils.BuyResponse;
 
 public interface IUserService {
     User findByUsername(String username);
@@ -9,6 +10,6 @@ public interface IUserService {
 
     User resetDeposit();
 
-    User buy(Long productId, int quantity);
+    BuyResponse buy(Long productId, int quantity);
 
 }
