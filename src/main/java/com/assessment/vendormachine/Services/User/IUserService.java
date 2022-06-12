@@ -10,4 +10,5 @@ public interface IUserService {
     User resetDeposit();
 
     User buy(Long productId, int quantity);
+
 }

@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-@Entity @Data
+@Entity
+@Data
 public class Product implements Serializable {
 
     @Id
@@ -22,6 +23,14 @@ public class Product implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sellerld")
     @JsonIgnoreProperties({"products"})
-    private User user;
+    private User seller;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "buy_transactions", joinColumns = {
+            @JoinColumn(name = "buyer_id")}, inverseJoinColumns = {
+            @JoinColumn(name = "bought_product_id")})
+    @JsonIgnoreProperties({"boughtProducts"})
+    private List<User> buyers;
+
 
 }

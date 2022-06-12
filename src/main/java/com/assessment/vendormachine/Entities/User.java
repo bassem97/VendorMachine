@@ -18,14 +18,22 @@ public class User implements Serializable {
     private String username;
     private String password;
     private int deposit;
+    private int totalSpent;
 
     @Enumerated(value = EnumType.STRING)
     private ROLE role;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "sellerld")
-    @JsonIgnoreProperties({"user"})
-    private List<Product> products;
+    @JsonIgnoreProperties({"seller"})
+    private List<Product> soldProducts;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "buy_transactions", joinColumns = {
+            @JoinColumn(name = "buyer_id")}, inverseJoinColumns = {
+            @JoinColumn(name = "bought_product_id")})
+    @JsonIgnoreProperties({"buyers"})
+    private List<Product> boughtProducts;
 
 
 }

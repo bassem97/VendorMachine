@@ -86,8 +86,19 @@ public class UserService implements IUserService, ICrudService<User, Long> {
     public User buy(Long productId, int quantity) {
         final User currentUser = getCurrentUser();
         Product product = productService.findById(productId);
-        if (currentUser.getDeposit() >= quantity * product.getCost() && product.getAmountAvailable() >= quantity) {
-            currentUser.setDeposit(currentUser.getDeposit() - quantity * product.getCost());
+        int totalAmount = quantity * product.getCost();
+        if (currentUser.getDeposit() >= totalAmount && product.getAmountAvailable() >= quantity) {
+            currentUser.setDeposit(currentUser.getDeposit() - totalAmount);
+            currentUser.setTotalSpent(currentUser.getTotalSpent() + totalAmount);
+            // add product to user list boughtProducts if not already present else get product from list and increase quantity
+//            if (currentUser.getBoughtProducts().contains(product)) {
+//                Product product1 = currentUser.getBoughtProducts().get(currentUser.getBoughtProducts().indexOf(product));
+//                product1.setQuantity(product1.getQuantity() + quantity);
+//            } else {
+//                product.setQuantity(quantity);
+//                currentUser.getBoughtProducts().add(product);
+//            }
+
             productService.decreaseAmountAvailable(product, quantity);
             return userRepository.save(currentUser);
         }

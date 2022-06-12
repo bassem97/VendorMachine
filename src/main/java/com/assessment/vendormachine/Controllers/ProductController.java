@@ -37,18 +37,18 @@ public class ProductController {
 
     @PutMapping("/{id}")
     // user can only update his own product and his role is seller
-    @PreAuthorize("authentication.principal.username == @productService.findById(#id).getUser().getUsername() && hasRole('ROLE_SELLER')")
+    @PreAuthorize("authentication.principal.username == @productService.findById(#id).seller().getUsername() && hasRole('ROLE_SELLER')")
     public ResponseEntity update(@RequestBody Product product, @PathVariable("id") Long id) {
         if (productService.update(product, id) == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("could not find product");
         }
         return ResponseEntity.ok(productService.update(product, id));
     }
-    
+
 
     @DeleteMapping("/{id}")
     // user can only delete his own product and his role is seller
-    @PreAuthorize("authentication.principal.username == @productService.findById(#id).getUser().getUsername() && hasRole('ROLE_SELLER')")
+    @PreAuthorize("authentication.principal.username == @productService.findById(#id).seller().getUsername() && hasRole('ROLE_SELLER')")
     public void delete(@PathVariable("id") long id) {
         productService.delete(id);
     }
