@@ -25,7 +25,7 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "sellerld")
     @JsonIgnoreProperties({"user"})
-    private List<Product> Product;
+    private List<Product> products;
 
 
 }
