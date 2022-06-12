@@ -62,4 +62,11 @@ public class UserController {
             return ResponseEntity.ok(userService.deposit(amount));
         return ResponseEntity.status(HttpStatus.CONFLICT).body("you can only deposit coins of 5, 10, 20, 50, 100");
     }
+
+    // reset deposit
+    @PostMapping("/resetDeposit")
+    @PreAuthorize("hasRole('ROLE_BUYER')")
+    public ResponseEntity resetDeposit() {
+        return ResponseEntity.ok(userService.resetDeposit());
+    }
 }

@@ -28,4 +28,5 @@ public class UserServiceDetails implements UserDetailsService {
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

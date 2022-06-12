@@ -6,4 +6,6 @@ public interface IUserService {
     User findByUsername(String username);
 
     User deposit(int amount);
+
+    User resetDeposit();
 }

@@ -16,10 +16,8 @@ import java.util.List;
 @Service
 @Slf4j
 public class UserService implements IUserService, ICrudService<User, Long> {
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
@@ -52,7 +50,6 @@ public class UserService implements IUserService, ICrudService<User, Long> {
 
     @Override
     public List<User> findAll() {
-
         return userRepository.findAll();
     }
 
@@ -68,10 +65,22 @@ public class UserService implements IUserService, ICrudService<User, Long> {
 
     @Override
     public User deposit(int amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = findByUsername(authentication.getName());
+        User currentUser = getCurrentUser();
         currentUser.setDeposit(currentUser.getDeposit() + amount);
         return userRepository.save(currentUser);
+    }
+
+
+    public User resetDeposit() {
+        User currentUser = getCurrentUser();
+        currentUser.setDeposit(0);
+        return userRepository.save(currentUser);
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = findByUsername(authentication.getName());
+        return currentUser;
     }
 
 }
