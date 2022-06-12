@@ -3,7 +3,9 @@ package com.assessment.vendormachine.Controllers;
 
 import com.assessment.vendormachine.Security.SecurityConfig;
 import com.assessment.vendormachine.Security.TokenProvider;
+import com.assessment.vendormachine.Services.User.UserService;
 import com.assessment.vendormachine.Services.User.UserServiceDetails;
+import com.assessment.vendormachine.Utils.ChangePasswordVM;
 import com.assessment.vendormachine.Utils.JwtRespone;
 import com.assessment.vendormachine.Utils.LoginModel;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +36,14 @@ public class AuthenticationController {
     @Autowired
     private UserServiceDetails userDetailsService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("login")
     public ResponseEntity<?> authenticate(@RequestBody LoginModel loginModel) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails)
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User with same username already logged in");
+        if (principal instanceof UserDetails && ((UserDetails) principal).getUsername().equals(loginModel.getUsername()))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("There is already an active session using your account");
 
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -54,11 +59,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JwtRespone(token));
     }
 
-//    @GetMapping("/logout")
-//    boolean logout(@AuthenticationPrincipal final User user) {
-////        authentication.logout(user);
-////        return true;
-//    }
+
+    @PostMapping("changePassword")
+    public Boolean changePassword(@RequestBody ChangePasswordVM changePasswordVM) {
+        return userService.changePassword(changePasswordVM);
+    }
 
 
 }

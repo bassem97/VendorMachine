@@ -7,6 +7,7 @@ import com.assessment.vendormachine.Repositories.UserRepository;
 import com.assessment.vendormachine.Services.ICrudService;
 import com.assessment.vendormachine.Services.Product.ProductService;
 import com.assessment.vendormachine.Utils.BuyResponse;
+import com.assessment.vendormachine.Utils.ChangePasswordVM;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -43,6 +44,7 @@ public class UserService implements IUserService, ICrudService<User, Long> {
             User user1 = userRepository.findById(aLong).get();
             user1.setDeposit(user.getDeposit());
             user1.setRole(user.getRole());
+            user1.setUsername(user.getUsername());
 
             return userRepository.save(user1);
         }
@@ -95,10 +97,20 @@ public class UserService implements IUserService, ICrudService<User, Long> {
             if (!currentUser.getBoughtProducts().contains(product))
                 currentUser.getBoughtProducts().add(product);
             userRepository.save(currentUser);
-            return new BuyResponse(currentUser.getTotalSpent(), currentUser.getBoughtProducts());
+            return new BuyResponse(currentUser.getTotalSpent(), currentUser.getDeposit(), currentUser.getBoughtProducts());
 
         }
         return null;
+    }
+
+    @Override
+    public Boolean changePassword(ChangePasswordVM changePasswordVM) {
+        final User currentUser = getCurrentUser();
+        if (bcryptEncoder.matches(changePasswordVM.getOldPassword(), currentUser.getPassword())) {
+            currentUser.setPassword(bcryptEncoder.encode(changePasswordVM.getNewPassword()));
+            userRepository.save(currentUser);
+            return true;
+        } else return false;
     }
 
 
