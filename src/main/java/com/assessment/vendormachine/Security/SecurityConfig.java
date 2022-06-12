@@ -1,4 +1,4 @@
-package com.assessment.vendormachine.Config.Security;
+package com.assessment.vendormachine.Security;
 
 import com.assessment.vendormachine.Services.User.UserServiceDetails;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.assessment.vendormachine.Config.Security;
+package com.assessment.vendormachine.Security;
 
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;

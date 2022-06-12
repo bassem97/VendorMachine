@@ -1,8 +1,8 @@
 package com.assessment.vendormachine.Controllers;
 
 
-import com.assessment.vendormachine.Config.Security.SecurityConfig;
-import com.assessment.vendormachine.Config.Security.TokenProvider;
+import com.assessment.vendormachine.Security.SecurityConfig;
+import com.assessment.vendormachine.Security.TokenProvider;
 import com.assessment.vendormachine.Services.User.UserServiceDetails;
 import com.assessment.vendormachine.Utils.JwtRespone;
 import com.assessment.vendormachine.Utils.LoginModel;
