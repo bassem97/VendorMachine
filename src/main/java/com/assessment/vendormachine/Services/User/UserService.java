@@ -1,9 +1,11 @@
 package com.assessment.vendormachine.Services.User;
 
 
+import com.assessment.vendormachine.Entities.Product;
 import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Repositories.UserRepository;
 import com.assessment.vendormachine.Services.ICrudService;
+import com.assessment.vendormachine.Services.Product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,9 @@ import java.util.List;
 public class UserService implements IUserService, ICrudService<User, Long> {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ProductService productService;
+
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
@@ -72,14 +77,27 @@ public class UserService implements IUserService, ICrudService<User, Long> {
 
 
     public User resetDeposit() {
-        User currentUser = getCurrentUser();
+        final User currentUser = getCurrentUser();
         currentUser.setDeposit(0);
         return userRepository.save(currentUser);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = findByUsername(authentication.getName());
+    @Override
+    public User buy(Long productId, int quantity) {
+        final User currentUser = getCurrentUser();
+        Product product = productService.findById(productId);
+        if (currentUser.getDeposit() >= quantity * product.getCost() && product.getAmountAvailable() >= quantity) {
+            currentUser.setDeposit(currentUser.getDeposit() - quantity * product.getCost());
+            productService.decreaseAmountAvailable(product, quantity);
+            return userRepository.save(currentUser);
+        }
+        return null;
+    }
+
+
+    public User getCurrentUser() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final User currentUser = findByUsername(authentication.getName());
         return currentUser;
     }
 

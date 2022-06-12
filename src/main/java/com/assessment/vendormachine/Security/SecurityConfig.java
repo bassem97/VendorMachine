@@ -1,5 +1,6 @@
 package com.assessment.vendormachine.Security;
 
+import com.assessment.vendormachine.Repositories.UserRepository;
 import com.assessment.vendormachine.Services.User.UserServiceDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     private JwtAuthenticationFilter authenticationFilter;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -64,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     public AuthenticationManager customAuthenticationManager() throws Exception {
         return super.authenticationManagerBean();
     }
+
 
 }
 

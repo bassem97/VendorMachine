@@ -8,4 +8,6 @@ public interface IUserService {
     User deposit(int amount);
 
     User resetDeposit();
+
+    User buy(Long productId, int quantity);
 }
