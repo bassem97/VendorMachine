@@ -12,6 +12,8 @@ public interface IUserService {
     User resetDeposit();
 
     BuyResponse buy(Long productId, int quantity);
-    
+
     Boolean changePassword(ChangePasswordVM changePasswordVM);
+
+
 }

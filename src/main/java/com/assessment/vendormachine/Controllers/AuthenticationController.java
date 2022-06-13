@@ -1,6 +1,7 @@
 package com.assessment.vendormachine.Controllers;
 
 
+import com.assessment.vendormachine.Entities.User;
 import com.assessment.vendormachine.Security.SecurityConfig;
 import com.assessment.vendormachine.Security.TokenProvider;
 import com.assessment.vendormachine.Services.User.UserService;
@@ -11,6 +12,7 @@ import com.assessment.vendormachine.Utils.LoginModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +43,11 @@ public class AuthenticationController {
 
     @PostMapping("login")
     public ResponseEntity<?> authenticate(@RequestBody LoginModel loginModel) {
-        Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
+//        log.error("username: " + userService.getUsersFromSessionRegistry().toString());
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User byUsername = userService.findByUsername(loginModel.getUsername());
+        if (byUsername.isActive())
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already logged in");
 
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -49,15 +55,18 @@ public class AuthenticationController {
                         loginModel.getPassword()
                 )
         );
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginModel.getUsername());
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (principal instanceof UserDetails && ((UserDetails) principal).getUsername().equals(loginModel.getUsername()))
+
+//                if (principal instanceof UserDetails && ((UserDetails) principal).getUsername().equals(loginModel.getUsername()))
 //            return ResponseEntity.status(HttpStatus.CONFLICT).body("There is already an active session using your account");
+//
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginModel.getUsername());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
         final String token;
         token = tokenProvider.generateToken(userDetails, 1);
+        byUsername.setActive(true);
+        userService.update(byUsername, byUsername.getId());
         return ResponseEntity.ok(new JwtRespone(token));
     }
 
@@ -65,6 +74,12 @@ public class AuthenticationController {
     @PostMapping("changePassword")
     public Boolean changePassword(@RequestBody ChangePasswordVM changePasswordVM) {
         return userService.changePassword(changePasswordVM);
+    }
+
+    @PostMapping("logout")
+    public User logout() {
+        userService.getCurrentUser().setActive(false);
+        return userService.update(userService.getCurrentUser(), userService.getCurrentUser().getId());
     }
 
 

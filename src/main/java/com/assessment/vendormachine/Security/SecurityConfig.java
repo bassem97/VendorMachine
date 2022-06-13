@@ -46,7 +46,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors();
-        http.logout().clearAuthentication(true);
     }
 
     @Override

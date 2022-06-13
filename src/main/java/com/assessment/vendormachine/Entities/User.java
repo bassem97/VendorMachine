@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String password;
     private int deposit;
     private int totalSpent;
+    private boolean isActive = false;
 
     @Enumerated(value = EnumType.STRING)
     private ROLE role;
