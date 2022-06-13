@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/products")
 @Slf4j
 public class ProductController {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     @Autowired
     private ProductService productService;
 
@@ -37,18 +34,19 @@ public class ProductController {
 
     @PutMapping("/{id}")
     // user can only update his own product and his role is seller
-    @PreAuthorize("authentication.principal.username == @productService.findById(#id).seller().getUsername() && hasRole('ROLE_SELLER')")
+    @PreAuthorize("authentication.principal.username == @productService.findById(#id).getSeller().getUsername() && hasRole('ROLE_SELLER')")
     public ResponseEntity update(@RequestBody Product product, @PathVariable("id") Long id) {
-        if (productService.update(product, id) == null) {
+        Product update = productService.update(product, id);
+        if (update == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("could not find product");
         }
-        return ResponseEntity.ok(productService.update(product, id));
+        return ResponseEntity.ok(update);
     }
 
 
     @DeleteMapping("/{id}")
     // user can only delete his own product and his role is seller
-    @PreAuthorize("authentication.principal.username == @productService.findById(#id).seller().getUsername() && hasRole('ROLE_SELLER')")
+    @PreAuthorize("authentication.principal.username == @productService.findById(#id).getSeller().getUsername() && hasRole('ROLE_SELLER')")
     public void delete(@PathVariable("id") long id) {
         productService.delete(id);
     }

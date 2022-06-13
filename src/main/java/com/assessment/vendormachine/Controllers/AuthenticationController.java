@@ -11,7 +11,6 @@ import com.assessment.vendormachine.Utils.LoginModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,11 +38,10 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
+
     @PostMapping("login")
     public ResponseEntity<?> authenticate(@RequestBody LoginModel loginModel) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails && ((UserDetails) principal).getUsername().equals(loginModel.getUsername()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("There is already an active session using your account");
+        Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
 
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -52,7 +50,11 @@ public class AuthenticationController {
                 )
         );
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginModel.getUsername());
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (principal instanceof UserDetails && ((UserDetails) principal).getUsername().equals(loginModel.getUsername()))
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("There is already an active session using your account");
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         final String token;
         token = tokenProvider.generateToken(userDetails, 1);

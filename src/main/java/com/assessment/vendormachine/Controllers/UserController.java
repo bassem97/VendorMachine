@@ -21,6 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("")
     public ResponseEntity findAll() {
         if (userService.findAll().isEmpty())

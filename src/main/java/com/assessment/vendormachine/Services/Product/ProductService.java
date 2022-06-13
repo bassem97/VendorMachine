@@ -34,7 +34,6 @@ public class ProductService implements IProductService, ICrudService<Product, Lo
             product1.setProductName(product.getProductName());
             product1.setCost(product.getCost());
             product1.setAmountAvailable(product.getAmountAvailable());
-            product1.setSeller(product.getSeller());
             return productRepository.save(product1);
         }
         return null;
