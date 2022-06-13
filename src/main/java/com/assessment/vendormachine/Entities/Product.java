@@ -22,14 +22,14 @@ public class Product implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sellerld")
-    @JsonIgnoreProperties({"products"})
+    @JsonIgnoreProperties({"products", "soldProducts"})
     private User seller;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "buy_transactions", joinColumns = {
             @JoinColumn(name = "buyer_id")}, inverseJoinColumns = {
             @JoinColumn(name = "bought_product_id")})
-    @JsonIgnoreProperties({"boughtProducts"})
+    @JsonIgnoreProperties({"boughtProducts", "soldProducts"})
     private List<User> buyers;
 
 

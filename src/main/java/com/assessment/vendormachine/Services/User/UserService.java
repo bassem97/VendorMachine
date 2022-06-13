@@ -73,10 +73,13 @@ public class UserService implements IUserService, ICrudService<User, Long> {
     }
 
     @Override
-    public User deposit(int amount) {
-        User currentUser = getCurrentUser();
-        currentUser.setDeposit(currentUser.getDeposit() + amount);
-        return userRepository.save(currentUser);
+    public User deposit(int amount, Long id) {
+        User user = userRepository.findById(id).get();
+        if (user != null) {
+            user.setDeposit(user.getDeposit() + amount);
+            return userRepository.save(user);
+        }
+        return null;
     }
 
 
@@ -87,18 +90,18 @@ public class UserService implements IUserService, ICrudService<User, Long> {
     }
 
     @Override
-    public BuyResponse buy(Long productId, int quantity) {
-        final User currentUser = getCurrentUser();
+    public BuyResponse buy(Long productId, Long buyerId, int quantity) {
+        User buyer = userRepository.findById(buyerId).get();
         Product product = productService.findById(productId);
         int totalAmount = quantity * product.getCost();
-        if (currentUser.getDeposit() >= totalAmount && product.getAmountAvailable() >= quantity) {
-            currentUser.setDeposit(currentUser.getDeposit() - totalAmount);
-            currentUser.setTotalSpent(currentUser.getTotalSpent() + totalAmount);
+        if (buyer.getDeposit() >= totalAmount && product.getAmountAvailable() >= quantity) {
+            buyer.setDeposit(buyer.getDeposit() - totalAmount);
+            buyer.setTotalSpent(buyer.getTotalSpent() + totalAmount);
             productService.decreaseAmountAvailable(product, quantity);
-            if (!currentUser.getBoughtProducts().contains(product))
-                currentUser.getBoughtProducts().add(product);
-            userRepository.save(currentUser);
-            return new BuyResponse(currentUser.getTotalSpent(), currentUser.getDeposit(), currentUser.getBoughtProducts());
+            if (!buyer.getBoughtProducts().contains(product))
+                buyer.getBoughtProducts().add(product);
+            userRepository.save(buyer);
+            return new BuyResponse(buyer.getTotalSpent(), buyer.getDeposit(), buyer.getBoughtProducts());
 
         }
         return null;

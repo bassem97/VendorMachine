@@ -23,7 +23,7 @@ public class ProductService implements IProductService, ICrudService<Product, Lo
 
     @Override
     public Product add(Product product) {
-        product.setSeller(userService.getCurrentUser());
+//        product.setSeller(userService.getCurrentUser());
         return productRepository.save(product);
     }
 

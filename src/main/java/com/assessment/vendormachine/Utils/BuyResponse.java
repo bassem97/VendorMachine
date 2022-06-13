@@ -21,7 +21,8 @@ public class BuyResponse implements Serializable {
         this.depositLeft = depositLeft;
         this.boughtProducts = boughtProducts;
         this.coinsLeft = new ArrayList<>();
-        // convert depositLeft into into coins and put in coinsLeft
+
+        // convert depositLeft into  coins and put in coinsLeft
         while (depositLeft > 0)
             if (depositLeft >= 100) {
                 coinsLeft.add(100);

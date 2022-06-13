@@ -57,11 +57,15 @@ public class UserController {
     }
 
 
-    @PostMapping("/deposit/{amount}")
+    @PostMapping("/deposit/{id}/{amount}")
     @PreAuthorize("hasRole('ROLE_BUYER')")
-    public ResponseEntity deposit(@PathVariable("amount") int amount) {
-        if (Arrays.asList(5, 10, 20, 50, 100).contains(amount))
-            return ResponseEntity.ok(userService.deposit(amount));
+    public ResponseEntity deposit(@PathVariable("amount") int amount, @PathVariable("id") Long id) {
+        if (Arrays.asList(5, 10, 20, 50, 100).contains(amount)) {
+            User deposit = userService.deposit(amount, id);
+            if (deposit == null)
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("could not find user");
+            return ResponseEntity.ok(deposit);
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT).body("you can only deposit coins of 5, 10, 20, 50, 100");
     }
 
@@ -73,10 +77,10 @@ public class UserController {
     }
 
     // buy product
-    @PostMapping("/buy/{productId}/{quantity}")
+    @PostMapping("/buy/{productId}/{buyerId}/{quantity}")
     @PreAuthorize("hasRole('ROLE_BUYER')")
-    public ResponseEntity buy(@PathVariable("productId") Long productId, @PathVariable("quantity") int quantity) {
-        BuyResponse buyResponse = userService.buy(productId, quantity);
+    public ResponseEntity buy(@PathVariable("productId") Long productId, @PathVariable("buyerId") Long buyerId, @PathVariable("quantity") int quantity) {
+        BuyResponse buyResponse = userService.buy(productId, buyerId, quantity);
         if (buyResponse == null)
             return ResponseEntity.status(HttpStatus.CONFLICT).body("you either don't have enough money or product quantity is not enough");
         return ResponseEntity.ok(buyResponse);
